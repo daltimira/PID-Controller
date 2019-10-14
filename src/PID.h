@@ -1,6 +1,8 @@
 #ifndef PID_H
 #define PID_H
 
+#include <vector>
+
 class PID {
  public:
   /**
@@ -31,6 +33,8 @@ class PID {
    */
   double TotalError();
 
+  double runTwiddle(double cte);
+
  private:
   /**
    * PID Errors
@@ -45,6 +49,17 @@ class PID {
   double Kp;
   double Ki;
   double Kd;
+
+  double tolerance = 0.001; // tolerance of the twiddle algorithm
+  int itTwiddle = 0;
+  int itParam = 0; // iteration between the 3 parameters of the PID contoller for the twiddle
+  const int nMax = 100;
+  int n = 0;
+  double error = 0;
+  double best_error = 10000;
+  std::vector<double> p;
+  std::vector<double> dp;
+  int idRun = 0;
 };
 
 #endif  // PID_H
