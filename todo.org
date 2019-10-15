@@ -1,0 +1,7 @@
+- Build PID controller.
+- Calculate steering angle. 
+- Tune PID parameters.
+- The vehicle should be able to drive successfuly.
+- Write reflection portion.
+
+- Steer in proportional to the cross track error.

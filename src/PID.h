@@ -50,16 +50,17 @@ class PID {
   double Ki;
   double Kd;
 
-  double tolerance = 0.001; // tolerance of the twiddle algorithm
+  double tolerance = 0.1; // tolerance of the twiddle algorithm
   int itTwiddle = 0;
-  int itParam = 0; // iteration between the 3 parameters of the PID contoller for the twiddle
+  int itParam = -1; // iteration between the 3 parameters of the PID contoller for the twiddle
   const int nMax = 100;
   int n = 0;
   double error = 0;
   double best_error = 10000;
   std::vector<double> p;
   std::vector<double> dp;
-  int idRun = 0;
+  int idRun = 1;
+  bool startUpdate = true; // start the update of the three parameters p
 };
 
 #endif  // PID_H
