@@ -38,7 +38,7 @@ void PID::UpdateError(double cte) {
 
 double PID::TotalError() {
   double error = -Kp*p_error - Kd*d_error - Ki*i_error;
-  return error; 
+  return error;
 }
 
 double PID::runTwiddle(double cte) {
@@ -49,6 +49,7 @@ double PID::runTwiddle(double cte) {
   if (sum_dp > tolerance) {
     n++;
 
+    // 'startUpdate' is called every time we try new set of parameters 'p'.
     if (startUpdate) {
       itParam++;
       if (itParam>2) itParam=0;
@@ -57,9 +58,10 @@ double PID::runTwiddle(double cte) {
       error = 0;
       idRun = 1;
       startUpdate = false;
-      steer = 0;
+      steer = 0; // init the vehicle status
     }
 
+    // if we finish a run
     if (n>(2*nMax)) {
       error = error/nMax;
       n = 0;
@@ -72,13 +74,13 @@ double PID::runTwiddle(double cte) {
           std::cout << p[0] << ", " << p[1] << ", " << p[2] << std::endl;
         } else {
           p[itParam] -= 2*dp[itParam];
+          // perform a second run
           idRun = 2;
           error = 0;
         }
       } else {
         if (idRun == 2) {
-          idRun = 1;
-          startUpdate = true;
+          startUpdate = true; // once we finish the second run, it is time to try a new set of parameters 'p'
           if (error < best_error) {
             best_error = error;
             dp[itParam] *= 1.1;

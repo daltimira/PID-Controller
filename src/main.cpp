@@ -35,14 +35,14 @@ int main() {
   uWS::Hub h;
 
   PID pid;
-  PID throttle_pid;
+  //PID throttle_pid;
   bool twiddle = true;
   bool firstStep = true;
   /**
    * TODO: Initialize the pid variable.
    */
 
-  h.onMessage([&pid, &throttle_pid, &twiddle, &firstStep](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
+  h.onMessage([&pid, &twiddle, &firstStep](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -83,39 +83,37 @@ int main() {
             double Kd = 0.7;
 
             pid.Init(Kp, Ki, Kd);
-            throttle_pid.Init(0, 0.0, 10);
-            firstStep = false; 
+            //throttle_pid.Init(0, 0, 0);
+            firstStep = false;
             }
             pid.UpdateError(cte);
-            throttle_pid.UpdateError(cte);
+            //throttle_pid.UpdateError(cte);
             steer_value = pid.TotalError();
           } else {
             if (firstStep) {
-               double Kp = 0.1;
-            double Ki = 0.001;
-            double Kd = 0.7;
+              // Init the twiddle algorithm with some initial parameters that can make the car stay
+              // on the road while we keep dynamically updating them to final optimal parameter solution
+              double Kp = 0.1;
+              double Ki = 0.001;
+              double Kd = 0.7;
 
               pid.Init(Kp, Ki, Kd);
-              firstStep = false; 
+              firstStep = false;
             }
             // we run this code when we want to get the optimal parameters
+            // runTwiddle returns the steering value
             steer_value = pid.runTwiddle(cte);
 
           }
-          
-          
+
+
           // DEBUG
-          //std::cout << "CTE: " << cte << " Steering Value: " << steer_value 
+          //std::cout << "CTE: " << cte << " Steering Value: " << steer_value
           //          << std::endl;
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          //msgJson["throttle"] = 0.3;
-         // if (speed < 0) {
-            msgJson["throttle"] = 0.3;
-         /* } else {
-            msgJson["throttle"] = 0.6 - throttle_pid.TotalError();
-          }*/
+          msgJson["throttle"] = 0.3;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           //std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
@@ -132,7 +130,7 @@ int main() {
     std::cout << "Connected!!!" << std::endl;
   });
 
-  h.onDisconnection([&h](uWS::WebSocket<uWS::SERVER> ws, int code, 
+  h.onDisconnection([&h](uWS::WebSocket<uWS::SERVER> ws, int code,
                          char *message, size_t length) {
     ws.close();
     std::cout << "Disconnected" << std::endl;
@@ -145,6 +143,6 @@ int main() {
     std::cerr << "Failed to listen to port" << std::endl;
     return -1;
   }
-  
+
   h.run();
 }
