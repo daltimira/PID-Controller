@@ -16,18 +16,6 @@ void PID::Init(double Kp_, double Ki_, double Kd_) {
   Kp = Kp_;
   Ki = Ki_;
   Kd = Kd_;
-
-  // for the twiddle
-  /*p.push_back(0);
-  p.push_back(0);
-  p.push_back(0);*/
-  p.push_back(Kp);
-  p.push_back(Kd);
-  p.push_back(Ki);
-
-  dp.push_back(0.1);
-  dp.push_back(0.1);
-  dp.push_back(0.1);
 }
 
 void PID::UpdateError(double cte) {
@@ -42,67 +30,72 @@ double PID::TotalError() {
 }
 
 double PID::runTwiddle(double cte) {
-  double sum_dp = dp[0]+dp[1]+dp[2];
+  error += cte*cte;
+  if (n==0) {
+    Init(p[0],p[1],p[2]);
+  }
   UpdateError(cte);
-  double steer = -p[0]*p_error - p[1]*d_error - p[2]*i_error;
-  std::cout <<  p[0] << ", " << p[1] << ", " << p[2] <<  std::endl;
-  if (sum_dp > tolerance) {
-    n++;
+  double steer_value = TotalError();
+  n++;
 
-    // 'startUpdate' is called every time we try new set of parameters 'p'.
-    if (startUpdate) {
-      itParam++;
-      if (itParam>2) itParam=0;
-      p[itParam] += dp[itParam];
-      n = 0;
-      error = 0;
-      idRun = 1;
-      startUpdate = false;
-      steer = 0; // init the vehicle status
-    }
+  if (startUpdate) {
+    startUpdate = false;
+    itParam++;
+    if (itParam>2) itParam=0;
+    p[itParam] += dp[itParam];
+    n = 0;
+    error = 0;
+    idRun = 1; 
+  }
 
-    // if we finish a run
-    if (n>(2*nMax)) {
-      error = error/nMax;
-      n = 0;
-      //std::cout << error << ":" <<  p[0] << ", " << p[1] << ", " << p[2] <<  best_error << std::endl;
-      if (idRun ==1) {
+  if (n>nMax) {
+    error = error/nMax;
+    n = 0;
+    //std::cout << error << ":" <<  p[0] << ", " << p[1] << ", " << p[2] <<  best_error << std::endl;
+    if (idRun ==1) {
+      if (error < best_error) {
+        best_error = error;
+        dp[itParam] *= 1.1;
+        //std::cout << "error 1 : " << error << ", best error: " <<  best_error << std::endl;
+        //std::cout << p[0] << ", " << p[1] << ", " << p[2] << std::endl;
+        //std::cout << dp[0] << ", " << dp[1] << ", " << dp[2] << std::endl;
+        startUpdate = true;
+      } else {
+        p[itParam] -= 2*dp[itParam];
+        // perform a second run
+        idRun = 2;
+        error = 0;
+        //std::cout << "else1 : " << p[0] << ", " << p[1] << ", " << p[2] << std::endl;
+        //std::cout << dp[0] << ", " << dp[1] << ", " << dp[2] << std::endl;
+      }
+    } else {
+      if (idRun == 2) {
+        startUpdate = true; // once we finish the second run, it is time to try a new set of parameters 'p'
         if (error < best_error) {
           best_error = error;
           dp[itParam] *= 1.1;
-          std::cout << "error: " << error << ", best error: " <<  best_error << std::endl;
-          std::cout << p[0] << ", " << p[1] << ", " << p[2] << std::endl;
+          //std::cout << "error: " << error << ", 2" <<  "best error: " <<  best_error << std::endl;
+          //std::cout << p[0] << ", " << p[1] << ", " << p[2] << std::endl;
+          //std::cout << dp[0] << ", " << dp[1] << ", " << dp[2] << std::endl;
         } else {
-          p[itParam] -= 2*dp[itParam];
-          // perform a second run
-          idRun = 2;
-          error = 0;
+          p[itParam] += dp[itParam];
+          dp[itParam] *= 0.9;
+          //std::cout << "else2: " << p[0] << ", " << p[1] << ", " << p[2] << std::endl;
+          //std::cout << dp[0] << ", " << dp[1] << ", " << dp[2] << std::endl;
         }
-      } else {
-        if (idRun == 2) {
-          startUpdate = true; // once we finish the second run, it is time to try a new set of parameters 'p'
-          if (error < best_error) {
-            best_error = error;
-            dp[itParam] *= 1.1;
-            std::cout << "error: " << error << ", 2" <<  "best error: " <<  best_error << std::endl;
-            std::cout << p[0] << ", " << p[1] << ", " << p[2] << std::endl;
-          } else {
-            p[itParam] += dp[itParam];
-            dp[itParam] *= 0.9;
-          }
-        }
-      }
-      error = 0;
-    } else {
-      if (n>= nMax) {
-        error += cte*cte;
-        //std::cout << "error: " << error << std::endl;
       }
     }
+    error = 0;
+  }
 
-   } else {
-    // finish the optimization of the parameters
-    std::cout << p[0] << ", " << p[1] << ", " << p[2] << std::endl;
-   }
-   return steer;
+  double sum_dp = dp[0]+dp[1]+dp[2];
+  if (sum_dp < tolerance) {
+    std::cout << "Best p[0] p[1] p[2]: " << p[0] << p[1] << p[2] << " ";
+  }
+
+
+  return steer_value;
 }
+  
+
+  

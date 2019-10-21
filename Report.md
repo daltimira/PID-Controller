@@ -36,4 +36,12 @@ Finally, I tunned the Ki.
 
 It seems that the Ki should be quite small, otherwise the vehicle starts showing bad behaviour.
 
-It seems that the behaviour of one parameter depends also on how the other parameters are tunned. So it is better to tune one at a time, and when the behaviour of the vehicle is the expected one for the right tunning of the parameter it is then time to go to next one. It can also be important the order of the parameters you tune. For example, it is better to tune first the Kp, as this is the one that tries to correct the steering value for the error. But by only tunning this parameter, you could observer oscilations on the vehicle. To fix that, it is introduced the Kd, whose goal is to fix the oscilations by adjusting the steering value as we approach the solutions. This helps reducing the overshoot. Finally, the Ki is introduced to system bias, drift or accumulative error.  
+It seems that the behaviour of one parameter depends also on how the other parameters are tunned. So it is better to tune one at a time, and when the behaviour of the vehicle is the expected one for the right tunning of the parameter it is then time to go to next one. It can also be important the order of the parameters you tune. For example, it is better to tune first the Kp, as this is the one that tries to correct the steering value for the error. But by only tunning this parameter, you could observer oscilations on the vehicle. To fix that, it is introduced the Kd, whose goal is to fix the oscilations by adjusting the steering value as we approach the solutions. This helps reducing the overshoot. Finally, the Ki is introduced to system bias, drift or accumulative error. 
+
+After tunning the parameters manually, I have obtained three parameters Kp, Kd and Ki, which the car run pretty well. I then implemented the twiddle algorithm to further adjust these parameters. So, from a starting Kp, Kd, and Ki obtained from the manual tunning, I initialized the three parameters 'dp'. I needed to be careful for the initialization of these three 'dp' parameters since if changed too much the Kp, Kd or Ki, the car could run out of the track. After running a few loops, the best parameters obtained were 0.11, 0.001, 0.7 from the Kp, Ki and Kd respectively. 
+
+
+
+
+
+

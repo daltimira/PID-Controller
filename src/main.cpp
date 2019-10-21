@@ -36,7 +36,7 @@ int main() {
 
   PID pid;
   //PID throttle_pid;
-  bool twiddle = true;
+  bool twiddle = false;
   bool firstStep = true;
   /**
    * TODO: Initialize the pid variable.
@@ -70,16 +70,15 @@ int main() {
           if (!twiddle) {
             if (firstStep) {
              // We init the pid with the parameters found
+  
+            // manual tunning
             /*double Kp = 0.1;
             double Ki = 0.001;
-            double Kd = 2.7;*/
-
-            /*double Kp = 0.1;
-            double Ki = 0.1;
             double Kd = 0.7;*/
 
-            double Kp = 0.1;
-            double Ki = 0.001;
+            // twiddle tunning after the manual tunning
+            double Kp = 0.11;
+            double Ki = 0.0015;
             double Kd = 0.7;
 
             pid.Init(Kp, Ki, Kd);
@@ -96,14 +95,12 @@ int main() {
               double Kp = 0.1;
               double Ki = 0.001;
               double Kd = 0.7;
-
               pid.Init(Kp, Ki, Kd);
               firstStep = false;
             }
             // we run this code when we want to get the optimal parameters
             // runTwiddle returns the steering value
             steer_value = pid.runTwiddle(cte);
-
           }
 
 
