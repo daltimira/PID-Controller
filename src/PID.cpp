@@ -90,7 +90,7 @@ double PID::runTwiddle(double cte) {
 
   double sum_dp = dp[0]+dp[1]+dp[2];
   if (sum_dp < tolerance) {
-    std::cout << "Best p[0] p[1] p[2]: " << p[0] << p[1] << p[2] << " ";
+    std::cout << "Best p[0] p[1] p[2]: " << p[0] << p[1] << p[2] << std::endl;
   }
 
 

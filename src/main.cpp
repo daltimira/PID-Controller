@@ -76,7 +76,7 @@ int main() {
             double Ki = 0.001;
             double Kd = 0.7;*/
 
-            // twiddle tunning after the manual tunning
+            // twiddle tunning (using the manual tunning as initial state)
             double Kp = 0.11;
             double Ki = 0.0015;
             double Kd = 0.7;

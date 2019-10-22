@@ -57,9 +57,7 @@ class PID {
   int n = 0;
   double error = 0;
   double best_error = 10000;
-  //std::vector<double> p;
-  //std::vector<double> dp;
-  int idRun = 1; // a run is a cycle where we update n from 0 to nMax, and we evaluate the parameters 'p' (calculate the error) for this cycle.
+  int idRun = 1; // a run is a cycle where we update n from 0 to nMax, and we evaluate the parameters 'p' (calculate the error).
   bool startUpdate = true; // start the update of the three parameters p
   double p[3] = {0.1, 0.001, 0.7};
   double dp[3] = {.01, .0005, .01};
